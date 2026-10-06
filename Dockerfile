@@ -10,8 +10,8 @@ RUN npm ci
 # Copy source and build
 COPY . .
 # Inject production API URLs at build time via build args
-ARG VITE_API_URL=http://localhost:8080/api/v1
-ARG VITE_WS_URL=http://localhost:8080/ws
+ARG VITE_API_URL=https://chess-backend-rmkb.onrender.com/api/v1
+ARG VITE_WS_URL=wss://chess-backend-rmkb.onrender.com/ws
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_WS_URL=$VITE_WS_URL
 RUN npm run build

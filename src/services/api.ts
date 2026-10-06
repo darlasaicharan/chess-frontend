@@ -1,13 +1,43 @@
 import axios from 'axios';
 import { useAuthStore } from '../store';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+// Backend REST API base URL
+// Priority:
+// 1. import.meta.env.VITE_API_URL (from .env or cloud provider env)
+// 2. Production mode default: https://chess-backend-rmkb.onrender.com/api/v1
+// 3. Development mode fallback: http://localhost:8080/api/v1
+const DEFAULT_API_BASE = import.meta.env.PROD
+  ? 'https://chess-backend-rmkb.onrender.com/api/v1'
+  : 'http://localhost:8080/api/v1';
 
-export const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 5000,
-  headers: { 'Content-Type': 'application/json' },
-});
+export const API_BASE = (import.meta.env.VITE_API_URL || DEFAULT_API_BASE).replace(/\/+$/, '');
+
+// WebSocket URL
+// In production (HTTPS): wss://chess-backend-rmkb.onrender.com/ws
+// In development (HTTP): ws://localhost:8080/ws
+export const WS_URL =
+  import.meta.env.VITE_WS_URL ||
+  (API_BASE.startsWith('https://')
+    ? API_BASE.replace(/^https:\/\//i, 'wss://').replace(/\/api\/v1\/?$/, '/ws')
+    : API_BASE.replace(/^http:\/\//i, 'ws://').replace(/\/api\/v1\/?$/, '/ws'));
+
+// SockJS fallback URL (uses HTTP/HTTPS)
+export const SOCKJS_URL =
+  API_BASE.startsWith('https://')
+    ? API_BASE.replace(/\/api\/v1\/?$/, '/ws')
+    : API_BASE.replace(/\/api\/v1\/?$/, '/ws');
+
+export const api = Object.assign(
+  axios.create({
+    baseURL: API_BASE,
+    timeout: 15000,
+    headers: { 'Content-Type': 'application/json' },
+  }),
+  {
+    wsUrl: WS_URL,
+    sockJsUrl: SOCKJS_URL,
+  }
+);
 
 // Attach JWT token to requests
 api.interceptors.request.use((config) => {
