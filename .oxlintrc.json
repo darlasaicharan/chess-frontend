@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "no-unused-vars": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react/purity": "off",
+    "react/preserve-manual-memoization": "off",
+    "react/set-state-in-effect": "off",
+    "react/immutability": "off",
+    "react/only-export-components": "off"
+  }
+}
